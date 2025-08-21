@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Font Canvas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div class="bg-white p-8 rounded-xl shadow-2xl">
+        <h1 class="text-3xl font-extrabold text-center mb-6 text-gray-800">
+            "Jeffery" Drawn on Canvas
+        </h1>
+        <canvas id="wordCanvas" class="border-4 border-slate-300 bg-white rounded-xl"></canvas>
+    </div>
+
+    <script>
+        window.onload = function() {
+            // Get the canvas element and its 2D rendering context
+            const canvas = document.getElementById('wordCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Set canvas dimensions
+            canvas.width = 450;
+            canvas.height = 200;
+
+            // Define constants for the drawing style
+            const blockSize = 3;
+            const letterSpacing = 8;
+            const lineHeight = 20; // Increased line height for a bigger line break
+            const letterColor = '#1e3a8a';
+
+            // Set the fill style for all rectangles
+            ctx.fillStyle = letterColor;
+
+            // Define the pixel data for all characters and a heart shape
+            // Each character is an array of objects, where each object represents a single pixel block
+            const characterData = {
+                'A': [
+                    {x: 1, y: 0}, {x: 2, y: 0},
+                    {x: 0, y: 1}, {x: 3, y: 1},
+                    {x: 0, y: 2}, {x: 3, y: 2},
+                    {x: 0, y: 3}, {x: 1, y: 3}, {x: 2, y: 3}, {x: 3, y: 3},
+                    {x: 0, y: 4}, {x: 3, y: 4},
+                ],
+                'B': [
+                    {x: 0, y: 0}, {x: 1, y: 0}, {x: 2, y: 0},
+                    {x: 0, y: 1}, {x: 3, y: 1},
+                    {x: 0, y: 2}, {x: 1, y: 2}, {x: 2, y: 2},
+                    {x: 0, y: 3}, {x: 3, y: 3},
+                    {x: 0, y: 4}, {x: 1, y: 4}, {x: 2, y: 4},
+                ],
+                'C': [
+                    {x: 1, y: 0}, {x: 2, y: 0}, {x: 3, y: 0},
+                    {x: 0, y: 1},
+                    {x: 0, y: 2},
+                    {x: 0, y: 3},
+                    {x: 1, y: 4}, {x: 2, y: 4}, {x: 3, y: 4},
+                ],
+                'D': [
+                    {x: 0, y: 0}, {x: 1, y: 0}, {x: 2, y: 0},
+                    {x: 0, y: 1}, {x: 3, y: 1},
+                    {x: 0, y: 2}, {x: 3, y: 2},
+                    {x: 0, y: 3}, {x: 3, y: 3},
+                    {x: 0, y: 4}, {x: 1, y: 4}, {x: 2, y: 4},
+                ],
+                'E': [
+                    {x: 0, y: 0}, {x: 1, y: 0}, {x: 2, y: 0}, {x: 3, y: 0},
+                    {x: 0, y: 1},
+                    {x: 0, y: 2}, {x: 1, y: 2}, {x: 2, y: 2},
+                    {x: 0, y: 3},
+                    {x: 0, y: 4}, {x: 1, y: 4}, {x: 2, y: 4}, {x: 3, y: 4},
+                ],
+                'F': [
+                    {x: 0, y: 0}, {x: 1, y: 0}, {x: 2, y: 0}, {x: 3, y: 0},
+                    {x: 0, y: 1},
+                    {x: 0, y: 2}, {x: 1, y: 2}, {x: 2, y: 2},
+                    {x: 0, y: 3},
+                    {x: 0, y: 4},
+                ],
+                'G': [
+                    {x: 1, y: 0}, {x: 2, y: 0}, {x: 3, y: 0},
+                    {x: 0, y: 1},
+                    {x: 0, y: 2}, {x: 2, y: 2}, {x: 3, y: 2},
+                    {x: 0, y: 3}, {x: 3, y: 3},
+                    {x: 1, y: 4}, {x: 2, y: 4}, {x: 3, y: 4},
+                ],
+                'H': [
+                    {x: 0, y: 0}, {x: 3, y: 0},
+                    {x: 0, y: 1}, {x: 3, y: 1},
+                    {x: 0, y: 2}, {x: 1, y: 2}, {x: 2, y: 2}, {x: 3, y: 2},
+                    {x: 0, y: 3}, {x: 3, y: 3},
+                    {x: 0, y: 4}, {x: 3, y: 4},
+                ],
+                'I': [
+                    {x: 0, y: 0}, {x: 1, y: 0}, {x: 2, y: 0},
+                    {x: 1, y: 1},
+                    {x: 1, y: 2},
+                    {x: 1, y: 3},
+                    {x: 0, y: 4}, {x: 1, y: 4}, {x: 2, y: 4},
+                ],
+                'J': [
+                    {x: 2, y: 0}, {x: 3, y: 0},
+                    {x: 3, y: 1},
+                    {x: 3, y: 2},
+                    {x: 0, y: 3}, {x: 3, y: 3},
+                    {x: 1, y: 4}, {x: 2, y: 4},
+                ],
+                'K': [
+                    {x: 0, y: 0}, {x: 3, y: 0},
+                    {x: 0, y: 1}, {x: 2, y: 1},
+                    {x: 0, y: 2}, {x: 1, y: 2},
+                    {x: 0, y: 3}, {x: 2, y: 3},
+                    {x: 0, y: 4}, {x: 3, y: 4},
+                ],
+                'L': [
+                    {x: 0, y: 0},
+                    {x: 0, y: 1},
+                    {x: 0, y: 2},
+                    {x: 0, y: 3},
+                    {x: 0, y: 4}, {x: 1, y: 4}, {x: 2, y: 4}, {x: 3, y: 4},
+                ],
+                'M': [
+                    {x: 0, y: 0}, {x: 1, y: 0}, {x: 3, y: 0}, {x: 4, y: 0},
+                    {x: 0, y: 1}, {x: 2, y: 1}, {x: 4, y: 1},
+                    {x: 0, y: 2}, {x: 2, y: 2}, {x: 4, y: 2},
+                    {x: 0, y: 3}, {x: 4, y: 3},
+                    {x: 0, y: 4}, {x: 4, y: 4},
+                ],
+                'N': [
+                    {x: 0, y: 0}, {x: 4, y: 0},
+                    {x: 0, y: 1}, {x: 1, y: 1}, {x: 4, y: 1},
+                    {x: 0, y: 2}, {x: 2, y: 2}, {x: 4, y: 2},
+                    {x: 0, y: 3}, {x: 3, y: 3}, {x: 4, y: 3},
+                    {x: 0, y: 4}, {x: 4, y: 4},
+                ],
+                'O': [
+                    {x: 1, y: 0}, {x: 2, y: 0},
+                    {x: 0, y: 1}, {x: 3, y: 1},
+                    {x: 0, y: 2}, {x: 3, y: 2},
+                    {x: 0, y: 3}, {x: 3, y: 3},
+                    {x: 1, y: 4}, {x: 2, y: 4},
+                ],
+                'P': [
+                    {x: 0, y: 0}, {x: 1, y: 0}, {x: 2, y: 0}, {x: 3, y: 0},
+                    {x: 0, y: 1}, {x: 3, y: 1},
+                    {x: 0, y: 2}, {x: 1, y: 2}, {x: 2, y: 2},
+                    {x: 0, y: 3},
+                    {x: 0, y: 4},
+                ],
+                'Q': [
+                    {x: 1, y: 0}, {x: 2, y: 0},
+                    {x: 0, y: 1}, {x: 3, y: 1},
+                    {x: 0, y: 2}, {x: 3, y: 2},
+                    {x: 0, y: 3}, {x: 2, y: 3}, {x: 3, y: 3},
+                    {x: 1, y: 4}, {x: 3, y: 4},
+                ],
+                'R': [
+                    {x: 0, y: 0}, {x: 1, y: 0}, {x: 2, y: 0},
+                    {x: 0, y: 1}, {x: 3, y: 1},
+                    {x: 0, y: 2}, {x: 1, y: 2}, {x: 2, y: 2},
+                    {x: 0, y: 3}, {x: 2, y: 3},
+                    {x: 0, y: 4}, {x: 3, y: 4},
+                ],
+                'S': [
+                    {x: 1, y: 0}, {x: 2, y: 0}, {x: 3, y: 0},
+                    {x: 0, y: 1},
+                    {x: 1, y: 2}, {x: 2, y: 2},
+                    {x: 3, y: 3},
+                    {x: 0, y: 4}, {x: 1, y: 4}, {x: 2, y: 4},
+                ],
+                'T': [
+                    {x: 0, y: 0}, {x: 1, y: 0}, {x: 2, y: 0}, {x: 3, y: 0},
+                    {x: 1, y: 1},
+                    {x: 1, y: 2},
+                    {x: 1, y: 3},
+                    {x: 1, y: 4},
+                ],
+                'U': [
+                    {x: 0, y: 0}, {x: 3, y: 0},
+                    {x: 0, y: 1}, {x: 3, y: 1},
+                    {x: 0, y: 2}, {x: 3, y: 2},
+                    {x: 0, y: 3}, {x: 3, y: 3},
+                    {x: 1, y: 4}, {x: 2, y: 4},
+                ],
+                'V': [
+                    {x: 0, y: 0}, {x: 3, y: 0},
+                    {x: 0, y: 1}, {x: 3, y: 1},
+                    {x: 0, y: 2}, {x: 3, y: 2},
+                    {x: 1, y: 3}, {x: 2, y: 3},
+                    {x: 1, y: 4}, {x: 2, y: 4},
+                ],
+                'W': [
+                    {x: 0, y: 0}, {x: 4, y: 0},
+                    {x: 0, y: 1}, {x: 4, y: 1},
+                    {x: 0, y: 2}, {x: 2, y: 2}, {x: 4, y: 2},
+                    {x: 0, y: 3}, {x: 1, y: 3}, {x: 3, y: 3}, {x: 4, y: 3},
+                    {x: 2, y: 4},
+                ],
+                'X': [
+                    {x: 0, y: 0}, {x: 3, y: 0},
+                    {x: 1, y: 1}, {x: 2, y: 1},
+                    {x: 1, y: 2}, {x: 2, y: 2},
+                    {x: 1, y: 3}, {x: 2, y: 3},
+                    {x: 0, y: 4}, {x: 3, y: 4},
+                ],
+                'Y': [
+                    {x: 0, y: 0}, {x: 3, y: 0},
+                    {x: 1, y: 1}, {x: 2, y: 1},
+                    {x: 1, y: 2},
+                    {x: 1, y: 3},
+                    {x: 1, y: 4},
+                ],
+                'Z': [
+                    {x: 0, y: 0}, {x: 1, y: 0}, {x: 2, y: 0}, {x: 3, y: 0},
+                    {x: 3, y: 1},
+                    {x: 2, y: 2},
+                    {x: 1, y: 3},
+                    {x: 0, y: 4}, {x: 1, y: 4}, {x: 2, y: 4}, {x: 3, y: 4},
+                ],
+                ' ': [{x: 0, y: 0}], // Empty space
+                '♥': [
+                    {x: 1, y: 0}, {x: 3, y: 0},
+                    {x: 0, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 3, y: 1}, {x: 4, y: 1},
+                    {x: 0, y: 2}, {x: 1, y: 2}, {x: 2, y: 2}, {x: 3, y: 2}, {x: 4, y: 2},
+                    {x: 1, y: 3}, {x: 2, y: 3}, {x: 3, y: 3},
+                    {x: 2, y: 4},
+                ],
+                '!': [
+                    {x: 1, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 1, y: 3},
+                    {x: 1, y: 5},
+                ]
+            };
+
+            // This function draws a single character
+            function drawCharacter(char, startX, startY) {
+                const charData = characterData[char.toUpperCase()];
+                if (!charData) {
+                    console.error(`Character '${char}' not found in pixel font data.`);
+                    return 0; // Return width of 0 for unknown characters
+                }
+
+                charData.forEach(pixel => {
+                    ctx.fillRect(
+                        startX + pixel.x * blockSize,
+                        startY + pixel.y * blockSize,
+                        blockSize,
+                        blockSize
+                    );
+                });
+
+                // Calculate the width of the drawn character for spacing
+                const charWidth = charData.reduce((maxWidth, pixel) => Math.max(maxWidth, pixel.x), 0) + 1;
+                return charWidth * blockSize;
+            }
+
+            // This is the main drawing function that draws an entire word with line breaks
+            function drawWord(word, startX, startY) {
+                let currentX = startX;
+                let currentY = startY;
+                for (let i = 0; i < word.length; i++) {
+                    const char = word[i];
+                    // Get the character data, handling undefined gracefully
+                    const charData = characterData[char.toUpperCase()];
+                    const charWidth = charData ? (charData.reduce((maxWidth, pixel) => Math.max(maxWidth, pixel.x), 0) + 1) * blockSize : 0;
+                    
+                    if (currentX + charWidth + letterSpacing > canvas.width) {
+                        // Move to the next line
+                        currentX = startX;
+                        currentY += lineHeight;
+                    }
+
+                    const drawnCharWidth = drawCharacter(char, currentX, currentY);
+                    currentX += drawnCharWidth + letterSpacing;
+                }
+            }
+
+            // Call the main function to draw the word "Jeffery"
+            drawWord("Welcome to the Fun World of Programming", 20, 20);
+        };
+    </script>
+
+</body>
+</html>
