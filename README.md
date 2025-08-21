@@ -4,17 +4,17 @@ This project is a playful exploration of HTML5 Canvas and JavaScript for creativ
 
 ## Files
 
-- **index1.html**  
-  Generates a colorful grid pattern on the canvas using simple loops and color logic.
+* **index1.html**  
+    Generates a colorful grid pattern on the canvas using simple loops and color logic.
 
-- **index2_AI..html**  
-  Uses a pixel font system to draw custom words and shapes (like a heart) on the canvas, styled with Tailwind CSS.
+* **index2_AI.html**  
+    Uses a pixel font system to draw custom words and shapes (like a heart) on the canvas, styled with Tailwind CSS.
 
 ## How to Run
 
-1. Open either HTML file in your browser.
-2. Enjoy the visual output and experiment with the code!
+  1. Open either HTML file in your browser.
+  2. Enjoy the visual output and experiment with the code!
 
 ## Purpose
 
-Just for fun and learning—feel free to modify, remix, and play with the
+  Just for fun and learning—feel free to modify, remix, and play around with the code.
