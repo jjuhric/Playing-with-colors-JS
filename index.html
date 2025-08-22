@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date Formatter</title>
+    <!-- Use the Inter font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Load Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body class="p-6">
+
+    <div id="output-container" class="space-y-4">
+        <!-- The results will be dynamically inserted here by JavaScript -->
+        <h1 class="text-3xl font-bold text-gray-900 mb-6">Date Formatter Results</h1>
+    </div>
+
+    <script>
+        /**
+         * Formats a date string, timestamp, or Date object into a specified format.
+         * It intelligently parses various date inputs, removes timezone information,
+         * and formats the output using the Intl.DateTimeFormat API.
+         * @param {string | number | Date} dateInput The date to be formatted.
+         * - Can be a date string ('YYYY-MM-DD', 'MM/DD/YYYY', etc.)
+         * - A Unix timestamp (in milliseconds).
+         * - A Date object.
+         * @param {object} options An object containing Intl.DateTimeFormat options.
+         * - Example options for US English locale:
+         * { year: 'numeric', month: 'long', day: 'numeric' } -> "March 15, 1982"
+         * { year: 'numeric', month: '2-digit', day: '2-digit' } -> "03/15/1982"
+         * { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' } -> "Tuesday, March 15, 1982"
+         * { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' } -> "12:00 AM" (always UTC time)
+         * @returns {string} The formatted date string, or an error message if parsing fails.
+         */
+        function formatDate(dateInput, options = {}) {
+            let date;
+
+            // First, handle different input types
+            if (dateInput instanceof Date) {
+                date = dateInput;
+            } else if (typeof dateInput === 'number') {
+                date = new Date(dateInput);
+            } else if (typeof dateInput === 'string') {
+                // Try to parse the string. The Date constructor handles many common formats.
+                date = new Date(dateInput);
+            } else {
+                return 'Invalid date input type.';
+            }
+
+            // Check if the date is valid after parsing
+            if (isNaN(date.getTime())) {
+                return 'Invalid date input format.';
+            }
+
+            // Create a new Date object that effectively removes the timezone
+            // by using the UTC values of the original date. This ensures consistency.
+            const dateWithoutTimezone = new Date(
+                date.getUTCFullYear(),
+                date.getUTCMonth(),
+                date.getUTCDate(),
+                date.getUTCHours(),
+                date.getUTCMinutes(),
+                date.getUTCSeconds(),
+                date.getUTCMilliseconds()
+            );
+
+            try {
+                // Use Intl.DateTimeFormat for powerful and locale-aware formatting.
+                // We explicitly set timeZone to 'UTC' to confirm we are working with the
+                // timezone-stripped date.
+                const formatter = new Intl.DateTimeFormat('en-US', { ...options, timeZone: 'UTC' });
+                return formatter.format(dateWithoutTimezone);
+            } catch (error) {
+                return `Formatting error: ${error.message}`;
+            }
+        }
+
+        // Get the container element to display the output
+        const outputContainer = document.getElementById('output-container');
+
+        // Helper function to append results to the page
+        function displayOutput(label, input, output) {
+            const item = document.createElement('div');
+            item.className = 'p-6 bg-white rounded-xl shadow-md';
+            item.innerHTML = `
+                <h3 class="text-xl font-semibold text-indigo-700">${label}</h3>
+                <p class="mt-2 text-sm text-gray-600 font-mono break-words"><strong>Input:</strong> ${input}</p>
+                <p class="text-lg font-bold text-gray-900 mt-2"><strong>Output:</strong> ${output}</p>
+            `;
+            outputContainer.appendChild(item);
+        }
+
+        // --- Corrected Example Usage for visual output ---
+
+        // Example 1: ISO 8601 string
+        const isoString = '2023-10-27T00:00:00.000Z';
+        displayOutput('Example 1: ISO 8601 String', isoString, formatDate(isoString, { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }));
+
+        // Example 2: Short date format string
+        const shortDate = '03/15/1982';
+        displayOutput('Example 2: Short Date String', shortDate, formatDate(shortDate, { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' }));
+
+        // Example 3: Different short date format string
+        const anotherShortDate = '3/15/82';
+        displayOutput('Example 3: Different Short Date String', anotherShortDate, formatDate(anotherShortDate, { year: 'numeric', month: 'numeric', day: 'numeric' }));
+
+        // Example 4: A Date object
+        const today = new Date();
+        displayOutput('Example 4: A Date object', today.toString(), formatDate(today, { year: 'numeric', month: 'long', day: 'numeric' }));
+
+        // Example 5: A Unix timestamp (milliseconds)
+        const timestamp = 1698422400000;
+        displayOutput('Example 5: A Unix Timestamp', timestamp, formatDate(timestamp, { year: 'numeric', month: 'long', day: 'numeric' }));
+
+        // Example 6: An invalid date string
+        const invalidDate = 'not a date';
+        displayOutput('Example 6: Invalid Date', invalidDate, formatDate(invalidDate, { year: 'numeric' }));
+    </script>
+</body>
+</html>
